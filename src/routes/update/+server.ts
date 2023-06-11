@@ -2,7 +2,7 @@ import type {RequestHandler} from './$types';
 
 import {
     SECRET
-} from '$env/dynamic/private';
+} from '$env/static/private';
 
 export const POST = (async ({request, platform}) => {
     // simple header auth
