@@ -1,11 +1,11 @@
 
 import type {RequestHandler} from './$types';
 
-export const GET = (async ({platform}) => {
+export const GET = (async ({platform, request}) => {
 
     let cache = await platform?.caches.default
 
-    let response = await cache?.match('get')
+    let response = await cache?.match(request)
 
     if (!response) {
         const result = await platform?.env.MAIN.list()
