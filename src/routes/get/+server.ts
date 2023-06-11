@@ -1,6 +1,5 @@
 
 import type {RequestHandler} from './$types';
-import {resolveBaseUrl} from "vite";
 
 export const GET = (async ({platform}) => {
 
