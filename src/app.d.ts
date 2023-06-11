@@ -6,17 +6,18 @@ declare global {
         // interface Locals {}
         // interface PageData {}
         // interface Platform {}
+        interface Platform {
+            env: {
+                MAIN: KVNamespace
+            };
+            context: {
+                waitUntil(promise: Promise<any>): void;
+            };
+            caches: CacheStorage & { default: Cache }
+        }
+
     }
 
-    interface Platform {
-        env: {
-            COUNTER: DurableObjectNamespace;
-        };
-        context: {
-            waitUntil(promise: Promise<any>): void;
-        };
-        caches: CacheStorage & { default: Cache }
-    }
 
 
 }
