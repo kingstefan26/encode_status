@@ -12,7 +12,10 @@ const config = {
 				include: ['/*'],
 				exclude: ['<all>']
 			}
-		})
+		}),
+		csrf: {
+			checkOrigin: false,
+		}
 	}
 };
 
