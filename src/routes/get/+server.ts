@@ -9,7 +9,7 @@ export const GET = (async ({platform, request}) => {
     let response = await cache?.match(request)
 
     if (!response) {
-        const data = await get_entries(platform?.env.MAIN)
+        const data = await get_entries(platform?.env.MAIN) || []
 
         response = new Response(JSON.stringify(data));
 

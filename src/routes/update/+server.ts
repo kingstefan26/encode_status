@@ -23,10 +23,19 @@ export const POST = (async ({request, platform}) => {
 
     switch (action) {
         case 'update':
-            await update_entry(data, platform?.env.MAIN)
+
+            try {
+                await update_entry(data, platform?.env.MAIN)
+            } catch (e) {
+                return new Response('error updating entry: ' + e, {status: 500})
+            }
             break;
         case 'delete':
+            try {
             await delete_entry(data.title, platform?.env.MAIN)
+            } catch (e) {
+                return new Response('error deleting entry: ' + e, {status: 500})
+            }
             break;
         default:
             return new Response('Action not found', {status: 404})
