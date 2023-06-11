@@ -34,7 +34,7 @@
             {#each statuses as status}
                 <div class="status_entry dark_mode">
                     <h3 class="stats_title">{status.title}</h3>
-                    <img height="300" width="200" src="{status.img}" alt="Movie Poster">
+                    <img class="poster" height="300" width="200" src="{status.img}" alt="Movie Poster">
                     <div class="bar">
                         <div class="status-bar">
                             <span style="width: {status.status}%;"></span>
@@ -106,7 +106,7 @@
 
     .stats_title {
         margin: 0;
-        max-width: min-content;
+        word-wrap: break-word;
     }
 
     .proc_text {
@@ -152,6 +152,9 @@
         }
     }
 
-
+    .poster {
+        object-fit: contain;
+        width: 100%;
+    }
 
 </style>

@@ -1,5 +1,6 @@
 
 import type {RequestHandler} from './$types';
+import {get_entries} from "../lib/server/kvWrapper";
 
 export const GET = (async ({platform, request}) => {
 
@@ -8,11 +9,7 @@ export const GET = (async ({platform, request}) => {
     let response = await cache?.match(request)
 
     if (!response) {
-        const result = await platform?.env.MAIN.list()
-
-        // @ts-ignore
-        const data = result.keys.map(({metadata}) => metadata)
-
+        const data = await get_entries(platform?.env.MAIN)
 
         response = new Response(JSON.stringify(data));
 
