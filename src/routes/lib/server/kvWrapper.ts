@@ -4,16 +4,16 @@
 export async function delete_entry(title: string, namespace: any){
     // await namespace.delete(title)
 
-    const store = await namespace.get('entries', {type: 'json'})
+    const entries = await get_entries(namespace)
 
 
-    store.forEach((entry: any, index: number) => {
+    entries.forEach((entry: any, index: number) => {
         if (entry.title === title){
-            store.splice(index, 1)
+            entries.splice(index, 1)
         }
     })
 
-    await namespace.put('entries', JSON.stringify(store))
+    await namespace.put('entries', JSON.stringify(entries))
 }
 
 export async function get_entries(namespace: any){
@@ -22,8 +22,7 @@ export async function get_entries(namespace: any){
     // // @ts-ignore
     // return result.keys.map(({metadata}) => metadata)
 
-    const store = await namespace.get('entries', {type: 'json'})
-    return store
+    return await namespace.get('entries', {type: 'json'}) || []
 }
 
 export async function update_entry(object: any, namespace: any){
@@ -42,11 +41,11 @@ export async function update_entry(object: any, namespace: any){
     //
     // await namespace.put(title, '', options)
 
-    const store = await namespace.get('entries', {type: 'json'})
+    const entries = await get_entries(namespace)
 
     let found = false
 
-    store.forEach((entry: any) => {
+    entries.forEach((entry: any) => {
         if (entry.title === object.title){
             found = true
             entry.img = object.img
@@ -57,7 +56,7 @@ export async function update_entry(object: any, namespace: any){
     })
 
     if (!found){
-        store.push({
+        entries.push({
             img: object.img,
             status: object.status,
             title: object.title,
@@ -66,5 +65,5 @@ export async function update_entry(object: any, namespace: any){
         })
     }
 
-    await namespace.put('entries', JSON.stringify(store))
+    await namespace.put('entries', JSON.stringify(entries))
 }
