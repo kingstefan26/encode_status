@@ -20,6 +20,10 @@
         <p>loading...</p>
     {:then statuses}
         <div class="wrapper dark_mode">
+            {#if statuses.length === 0}
+                <p>nothing here ngl</p>
+                <img src="/sticker.webp" alt="sticker">
+            {/if}
             {#each statuses as status}
                 <div class="status_entry dark_mode">
                     <h3 class="stats_title">{status.title}</h3>
