@@ -50,10 +50,9 @@
 
     @font-face {
         font-family: "Inter Display SemiBold";
-        src: url("/Inter-DisplaySemiBold.otf");
+        src: url("/PublicSans-VariableFont_wght.ttf");
         font-display: swap;
     }
-
 
     * {
         font-family: "Inter Display SemiBold", sans-serif;
