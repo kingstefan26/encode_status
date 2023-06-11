@@ -8,6 +8,13 @@
 <head>
     <title>Encode Status Page</title>
     <link rel="preload" as="font">
+
+    <meta property="og:title" content="Encode Status Page">
+    <meta property="og:description" content="A page to show the status of my encodes">
+    <meta property="og:image" content="https://encodestatus.kokoniara.software/sticker.webp">
+    <meta property="og:url" content="https://encodestatus.kokoniara.software/">
+    <meta property="og:type" content="website">
+
 </head>
 
 <div class="dark_mode body">
@@ -99,6 +106,7 @@
 
     .stats_title {
         margin: 0;
+        max-width: min-content;
     }
 
     .proc_text {
