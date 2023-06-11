@@ -4,7 +4,7 @@
 export async function delete_entry(title: string, namespace: any){
     // await namespace.delete(title)
 
-    const store = await namespace.get('entries', 'json')
+    const store = await namespace.get('entries', {type: 'json'})
 
 
     store.forEach((entry: any, index: number) => {
@@ -22,7 +22,7 @@ export async function get_entries(namespace: any){
     // // @ts-ignore
     // return result.keys.map(({metadata}) => metadata)
 
-    const store = await namespace.get('entries', 'json')
+    const store = await namespace.get('entries', {type: 'json'})
     return store
 }
 
@@ -42,7 +42,7 @@ export async function update_entry(object: any, namespace: any){
     //
     // await namespace.put(title, '', options)
 
-    const store = await namespace.get('entries', 'json')
+    const store = await namespace.get('entries', {type: 'json'})
 
     let found = false
 
