@@ -19,18 +19,22 @@
 
 <div class="dark_mode body">
     <div class="header dark_mode">
-        <h1>Encode Status Page</h1>
+        <h1>STATUS</h1>
     </div>
 
+    <h3>Workers</h3>
     {#await data.stream.workers}
-        <p>loading</p>
+        <div class="chips_container">
+            <div class="chip">
+                <div style="width: 8em; height: 1.1em; border-radius: 2px; margin-bottom: 1em" class="pulse_anim"></div>
+                <div style="width: 14em; height: 1.9em; border-radius: 2px " class="pulse_anim"></div>
+            </div>
+        </div>
     {:then workers}
         {#if workers.length !== 0}
-            <h3>Workers</h3>
+
             <div class="chips_container">
                 {#each workers as worker}
-                    <!-- display id status utilization fields in a chips like design-->
-                    <!--if worker.lastupdate was 2mins+ ago display in gray-->
                     <div class="chip">
                         <h4 class="chip_header">{worker.id}</h4>
                         <div style="margin: 0.2em">{worker.status}</div>
@@ -52,16 +56,26 @@
         <p>error: {error.message}</p>
     {/await}
 
-    {#await data.stream.statues}
-        <p>loading...</p>
-    {:then statuses}
-        <div class="dark_mode">
-            {#if statuses.length === 0}
-                <p>nothing here ngl</p>
-                <img src="/sticker.webp" alt="sticker">
-            {:else}
-                <h2>In Progress</h2>
-                <div class="wrapper">
+    <div class="dark_mode">
+        <h2>Encodes</h2>
+        <div class="wrapper">
+            {#await data.stream.statues}
+                {#each Array(3) as _}
+                    <div class="status_entry dark_mode">
+                        <div style="height: 1.5em;width: 10em; border-radius: 2px" class="stats_title pulse_anim"></div>
+                        <div class="poster pulse_anim_ligher " style="height:300px; width:200px; margin-top: 2px; display: flex;
+                    align-items: center; justify-content: center; border-radius: 5px">
+                            <div class="pulse_anim_darker"
+                                 style="width: 98%; height:98%; border-radius: 5px; box-shadow: #101010 0 0 10px"></div>
+                        </div>
+                        <div style="width: 6em; height: 0.9em; border-radius: 4px" class="pulse_anim_darker"></div>
+                    </div>
+                {/each}
+            {:then statuses}
+                {#if statuses.length === 0}
+                    <p>nothing here ngl</p>
+                    <img src="/sticker.webp" alt="sticker">
+                {:else}
                     {#each statuses as status}
                         <div class="status_entry dark_mode">
                             <h3 class="stats_title">{status.title}</h3>
@@ -73,18 +87,15 @@
                                 </div>
                                 <p class="proc_text">{status.status}%</p>
                             </div>
-                            <p>Phase: {status.phase}</p>
+                            <div>Phase: {status.phase}</div>
                         </div>
                     {/each}
-                </div>
-
-            {/if}
+                {/if}
+            {:catch error}
+                <p>error: {error.message}</p>
+            {/await}
         </div>
-
-    {:catch error}
-        <p>error: {error.message}</p>
-    {/await}
-
+    </div>
 
 </div>
 
@@ -111,11 +122,44 @@
     }
 
 
+    .pulse_anim {
+        animation: loading-animation 1.2s ease-in-out infinite;
+        background-color: #333333;
+        background-repeat: no-repeat;
+        background-image: linear-gradient(
+                90deg,
+                #333333,
+                #626262,
+                #333333
+        );
+    }
+
+    .pulse_anim_darker {
+        animation: loading-animation 1.2s ease-in-out infinite;
+        background-color: #232323;
+        background-repeat: no-repeat;
+        background-image: linear-gradient(
+                90deg,
+                #232323,
+                #626262,
+                #232323
+        );
+    }
+
+    @keyframes loading-animation {
+        0% {
+            background-position: -200px 0;
+        }
+        100% {
+            background-position: calc(200px + 100%) 0;
+        }
+    }
+
+
     .bar {
         display: grid;
         /*  80% 20% horizontal split */
         grid-template-columns: 80% 20%;
-        margin-bottom: 1em;
     }
 
     .chip {
@@ -124,7 +168,7 @@
         padding: 1em;
         width: 30%;
         max-height: 200px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 0 20px rgba(12, 12, 12, 0.5);
         min-width: 200px;
         margin: 1em;
         display: flex;
@@ -180,6 +224,9 @@
     }
 
     .status_entry {
+        display: grid;
+        grid-template-rows: 1fr 300px auto auto;
+        grid-gap: 0.3em;
         padding: 1em;
     }
 
@@ -217,6 +264,8 @@
     }
 
     .poster {
+        box-shadow: #101010 0 0 10px;
+        border-radius: 3px;
         object-fit: contain;
         width: 100%;
     }
