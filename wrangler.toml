@@ -1,0 +1,7 @@
+name = "encode-status"
+main = ".svelte-kit/cloudflare/_worker.js"
+compatibility_date = "2023-12-22"
+
+[[kv_namespaces]]
+binding = "MAIN"
+id = "2afe816233e643cf9ee6b7764e47cb8a"
