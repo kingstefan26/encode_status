@@ -27,7 +27,7 @@ export const GET = (async ({platform, request}) => {
     // if for 2 days+ last online, delete the status from the list
 
     data = data.map((entry: any) => {
-        if (Date.now() - entry.lastupdate > 2 * 60 * 1000) {
+        if (Date.now() - entry.lastupdate > 2 * 60 * 1000 && entry.phase !== 'Done') {
             entry.phase = 'Idle'
         }
         return entry
