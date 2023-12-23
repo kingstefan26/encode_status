@@ -34,6 +34,7 @@ export const POST = (async ({request, platform}) => {
                         found = true
                         worker.utilization = data.utilization
                         worker.status = data.status
+                        worker.ws_ip = data.ws_ip
                         worker.lastupdate = Date.now()
                     }
                 })

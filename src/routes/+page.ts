@@ -2,7 +2,7 @@ import type {PageLoad} from './$types';
 
 import {dev} from '$app/environment';
 
-export const load = (({fetch}) => {
+export const load = ( async ({fetch}) => {
 
     let statuses_data: Promise<any>
     let workers_data: Promise<any>
@@ -59,25 +59,29 @@ export const load = (({fetch}) => {
                                 id: 'worker1',
                                 status: 'working on Silo 2023 S01E01',
                                 utilization: 4,
-                                lastupdate: 0
+                                lastupdate: 0,
+                                ws_ip: "localhost"
                             },
                             {
                                 id: 'worker2',
                                 status: 'working on Silo 2023 S01E02',
                                 utilization: 95,
-                                lastupdate: 0
+                                lastupdate: 0,
+                                ws_ip: "localhost"
                             },
                             {
                                 id: 'worker3',
                                 status: 'working on Silo 2023 S01E03',
                                 utilization: 3,
-                                lastupdate: 0
+                                lastupdate: 0,
+                                ws_ip: "localhost"
                             },
                             {
                                 id: 'worker4',
                                 status: 'paused',
                                 utilization: 0,
-                                lastupdate: 0
+                                lastupdate: 0,
+                                ws_ip: "localhost"
                             },
                         ]
                     )
@@ -90,13 +94,15 @@ export const load = (({fetch}) => {
     }
 
     return {
-        stream: {
-            statues: new Promise(async (fulfil) => {
-                fulfil(await statuses_data)
-            }),
-            workers: new Promise(async (fulfil) => {
-                fulfil(await workers_data)
-            })
-        }
+        // stream: {
+        //     statues: new Promise(async (fulfil) => {
+        //         fulfil(await statuses_data)
+        //     }),
+        //     workers: new Promise(async (fulfil) => {
+        //         fulfil(await workers_data)
+        //     })
+        // }
+        statuses: await statuses_data,
+        workers: await workers_data
     };
 }) satisfies PageLoad;

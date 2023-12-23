@@ -1,7 +1,55 @@
 <script lang="ts">
     import type {PageData} from './$types';
+    import {scale} from "svelte/transition";
+    import {onMount} from "svelte";
 
     export let data: PageData;
+
+    let realtime_update_status = "idle";
+    let realtime_update_border_color = "#343434";
+    let realtime_bg_color = "#1f1f1f";
+
+    onMount(async () => {
+        for (const worker of data.workers) {
+            if (worker.ws_ip !== "") {
+                realtime_update_status = "Connecting...";
+                realtime_update_border_color = "#428ae8";
+                realtime_bg_color = "#1b242d";
+                console.log("Found worker with a websocket ip: " + worker.ws_ip);
+                const ws = new WebSocket(`ws://${worker.ws_ip}:6542`);
+                ws.onopen = () => {
+                    console.log("Connected to worker: " + worker.id);
+                    realtime_update_status = "Connected";
+                    realtime_update_border_color = "#0f9d58";
+                    realtime_bg_color = "#074f2c";
+                    ws.onmessage = (event) => {
+                        const {type, data} = JSON.parse(event.data);
+                        console.log(`Received data from worker ${worker.id}: ${JSON.stringify(data)}`);
+                        if (type === "worker") {
+                            worker.status = data.status;
+                            worker.utilization = data.utilization;
+                        } else if (data.type === "status") {
+                            for (const status of data.statuses) {
+                                for (const s of data.statuses) {
+                                    if (s.title === status.title) {
+                                        s.status = status.status;
+                                        s.phase = status.phase;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                ws.onerror = (e) => {
+                    console.log("Error connecting to worker: " + worker.id);
+                    realtime_update_status = "Error";
+                    realtime_update_border_color = "#db4437";
+                    realtime_bg_color = "#65211b";
+                }
+                break; // only connect to one worker
+            }
+        }
+    })
 </script>
 
 
@@ -21,20 +69,25 @@
     <div class="header dark_mode">
         <h1>STATUS</h1>
     </div>
+    <div
+            style="padding: 10px; width: min-content; position: absolute; right: 20px; top: 20px; border-radius: 5px; box-shadow: 0 0 20px rgba(12, 12, 12, 0.5); background-color: {realtime_bg_color};  border: {realtime_update_border_color} 2px solid;">
+        {realtime_update_status}
+    </div>
 
     <h3>Workers</h3>
-    {#await data.stream.workers}
-        <div class="chips_container">
-            <div class="chip">
-                <div style="width: 8em; height: 1.1em; border-radius: 2px; margin-bottom: 1em" class="pulse_anim"></div>
-                <div style="width: 14em; height: 1.9em; border-radius: 2px " class="pulse_anim"></div>
-            </div>
-        </div>
-    {:then workers}
-        {#if workers.length !== 0}
+    <!--{#await data.stream.workers}-->
+    <!--    <div class="chips_container">-->
+    <!--        <div class="chip">-->
+    <!--            <div style="width: 8em; height: 1.1em; border-radius: 2px; margin-bottom: 1em" class="pulse_anim"></div>-->
+    <!--            <div style="width: 14em; height: 1.9em; border-radius: 2px " class="pulse_anim"></div>-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <!--{:then workers}-->
+    {#if data.workers.length !== 0}
 
-            <div class="chips_container">
-                {#each workers as worker}
+        <div class="chips_container">
+            {#each data.workers as worker}
+                {#key worker}
                     <div class="chip">
                         <h4 class="chip_header">{worker.id}</h4>
                         <div style="margin: 0.2em">{worker.status}</div>
@@ -47,53 +100,53 @@
                             </div>
                         {/if}
                     </div>
+                {/key}
+            {/each}
+        </div>
 
-                {/each}
-            </div>
-
-        {/if}
-    {:catch error}
-        <p>error: {error.message}</p>
-    {/await}
+    {/if}
+    <!--{:catch error}-->
+    <!--    <p>error: {error.message}</p>-->
+    <!--{/await}-->
 
     <div class="dark_mode">
         <h2>Encodes</h2>
         <div class="wrapper">
-            {#await data.stream.statues}
-                {#each Array(3) as _}
+            <!--{#await data.stream.statues}-->
+            <!--    {#each Array(3) as _}-->
+            <!--        <div class="status_entry dark_mode">-->
+            <!--            <div style="height: 1.5em;width: 10em; border-radius: 2px" class="stats_title pulse_anim"></div>-->
+            <!--            <div class="poster pulse_anim_ligher " style="height:300px; width:200px; margin-top: 2px; display: flex;-->
+            <!--        align-items: center; justify-content: center; border-radius: 5px">-->
+            <!--                <div class="pulse_anim_darker"-->
+            <!--                     style="width: 98%; height:98%; border-radius: 5px; box-shadow: #101010 0 0 10px"></div>-->
+            <!--            </div>-->
+            <!--            <div style="width: 6em; height: 0.9em; border-radius: 4px" class="pulse_anim_darker"></div>-->
+            <!--        </div>-->
+            <!--    {/each}-->
+            <!--{:then statuses}-->
+            {#if data.statuses.length === 0}
+                <p>nothing here ngl</p>
+                <img src="/sticker.webp" alt="sticker">
+            {:else}
+                {#each data.statuses as status}
                     <div class="status_entry dark_mode">
-                        <div style="height: 1.5em;width: 10em; border-radius: 2px" class="stats_title pulse_anim"></div>
-                        <div class="poster pulse_anim_ligher " style="height:300px; width:200px; margin-top: 2px; display: flex;
-                    align-items: center; justify-content: center; border-radius: 5px">
-                            <div class="pulse_anim_darker"
-                                 style="width: 98%; height:98%; border-radius: 5px; box-shadow: #101010 0 0 10px"></div>
+                        <h3 class="stats_title">{status.title}</h3>
+                        <img class="poster" height="300" width="200" src="{status.img}" alt="Movie Poster">
+                        <div class="bar">
+                            <div class="status-bar">
+                                <span style="width: {status.status}%;"></span>
+
+                            </div>
+                            <p class="proc_text">{status.status}%</p>
                         </div>
-                        <div style="width: 6em; height: 0.9em; border-radius: 4px" class="pulse_anim_darker"></div>
+                        <div>Phase: {status.phase}</div>
                     </div>
                 {/each}
-            {:then statuses}
-                {#if statuses.length === 0}
-                    <p>nothing here ngl</p>
-                    <img src="/sticker.webp" alt="sticker">
-                {:else}
-                    {#each statuses as status}
-                        <div class="status_entry dark_mode">
-                            <h3 class="stats_title">{status.title}</h3>
-                            <img class="poster" height="300" width="200" src="{status.img}" alt="Movie Poster">
-                            <div class="bar">
-                                <div class="status-bar">
-                                    <span style="width: {status.status}%;"></span>
-
-                                </div>
-                                <p class="proc_text">{status.status}%</p>
-                            </div>
-                            <div>Phase: {status.phase}</div>
-                        </div>
-                    {/each}
-                {/if}
-            {:catch error}
-                <p>error: {error.message}</p>
-            {/await}
+            {/if}
+            <!--{:catch error}-->
+            <!--    <p>error: {error.message}</p>-->
+            <!--{/await}-->
         </div>
     </div>
 
