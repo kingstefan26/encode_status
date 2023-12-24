@@ -10,45 +10,72 @@
     let realtime_bg_color = "#1f1f1f";
 
     onMount(async () => {
+        let ws_ip = undefined;
         for (const worker of data.workers) {
+
             if (worker.ws_ip !== "") {
+                ws_ip = worker.ws_ip;
+                break // only connect to one worker
+            }
+        }
+
+        if (ws_ip) {
+            const connect_to_ws = () => {
                 realtime_update_status = "Connecting...";
                 realtime_update_border_color = "#428ae8";
                 realtime_bg_color = "#1b242d";
-                console.log("Found worker with a websocket ip: " + worker.ws_ip);
-                const ws = new WebSocket(`ws://${worker.ws_ip}:6542`);
+                console.log("Found worker with a websocket ip: " + ws_ip);
+                const ws = new WebSocket(`ws://${ws_ip}:6542`);
                 ws.onopen = () => {
-                    console.log("Connected to worker: " + worker.id);
+                    console.log("Connected to worker websocket");
                     realtime_update_status = "Connected";
                     realtime_update_border_color = "#0f9d58";
                     realtime_bg_color = "#074f2c";
                     ws.onmessage = (event) => {
-                        const {type, data} = JSON.parse(event.data);
-                        console.log(`Received data from worker ${worker.id}: ${JSON.stringify(data)}`);
-                        if (type === "worker") {
-                            worker.status = data.status;
-                            worker.utilization = data.utilization;
-                        } else if (data.type === "status") {
-                            for (const status of data.statuses) {
-                                for (const s of data.statuses) {
-                                    if (s.title === status.title) {
-                                        s.status = status.status;
-                                        s.phase = status.phase;
-                                    }
+                        const ws_data = JSON.parse(event.data);
+
+                        console.log(`Received data from worker ${ws_data.data.id}: ${event.data}`);
+
+                        if (ws_data.type === "worker") {
+                            for (const w of data.workers) {
+                                if (w.id === ws_data.data.id) {
+                                    w.status = ws_data.data.status;
+                                    w.utilization = ws_data.data.utilization;
                                 }
                             }
+                            data.workers = data.workers;
+                        } else if (ws_data.type === "status") {
+                            for (const status of data.statuses) {
+                                const ws_status = ws_data.data
+                                if (ws_status.title === status.title) {
+                                    status.status = ws_status.status;
+                                    status.phase = ws_status.phase;
+                                    break;
+                                }
+                            }
+                            data.statuses = data.statuses;
                         }
                     }
                 }
                 ws.onerror = (e) => {
-                    console.log("Error connecting to worker: " + worker.id);
+                    console.log("Error connecting to ws");
                     realtime_update_status = "Error";
                     realtime_update_border_color = "#db4437";
                     realtime_bg_color = "#65211b";
                 }
-                break; // only connect to one worker
+                ws.onclose = (e) => {
+                    console.log("Disconnected from ws");
+                    realtime_update_status = "Disconnected";
+                    realtime_update_border_color = "#db4437";
+                    realtime_bg_color = "#65211b";
+                    setTimeout(() => {
+                        connect_to_ws()
+                    }, 5000)
+                }
             }
+            connect_to_ws()
         }
+
     })
 </script>
 
@@ -84,7 +111,6 @@
     <!--    </div>-->
     <!--{:then workers}-->
     {#if data.workers.length !== 0}
-
         <div class="chips_container">
             {#each data.workers as worker}
                 {#key worker}

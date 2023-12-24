@@ -56,7 +56,7 @@ export const load = ( async ({fetch}) => {
             setTimeout(() =>
                     fulfil([
                             {
-                                id: 'worker1',
+                                id: 'kokoniara-B550MH',
                                 status: 'working on Silo 2023 S01E01',
                                 utilization: 4,
                                 lastupdate: 0,
